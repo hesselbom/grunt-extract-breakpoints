@@ -1,0 +1,16 @@
+
+    .no-mediaqueries p {
+        font-size: 6px;
+    }
+
+    .no-mediaqueries p {
+        font-size: 7px;
+    }
+ .no-mediaqueries p { font-size: 7.5px; } 
+    .no-mediaqueries p {
+        font-size: 9px;
+    }
+
+    .no-mediaqueries span {
+        font-size: 9px;
+    }

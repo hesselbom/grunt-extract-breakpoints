@@ -1,0 +1,37 @@
+p {
+    font-size: 5px;
+}
+
+// 630px
+@media (min-width: 39.375em) {
+    p {
+        font-size: 6px;
+    }
+}
+
+// 900px
+@media (max-width: 900px) {
+    p {
+        font-size: 7px;
+    }
+}
+@media (max-width: 900px) { p { font-size: 7.5px; } }
+
+// 940px
+@media (min-width: 58.75em) {
+    p {
+        font-size: 8px;
+    }
+}
+@media (min-width: 58.75rem) { p { font-size: 8.5px; } }
+
+// 0px - 800px
+@media screen and (min-width: 0) and (max-width: 800px) {
+    p {
+        font-size: 9px;
+    }
+
+    span {
+        font-size: 9px;
+    }
+}
