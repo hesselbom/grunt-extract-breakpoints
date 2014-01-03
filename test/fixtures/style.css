@@ -27,7 +27,7 @@ p {
 
 // 0px - 800px
 @media screen and (min-width: 0) and (max-width: 800px) {
-    p {
+    .nested p {
         font-size: 9px;
     }
 
