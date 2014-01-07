@@ -53,7 +53,7 @@ module.exports = function(grunt) {
         }
 
         function addWrapperClass(css, wrapper_class) {
-            var regex = new RegExp(/(\s*)([^{}]+)\s*{/g),
+            var regex = new RegExp(/(\s*)([^{},]+)\s*[{,]/g),
                 match,
                 wrapper_class = ' .' + wrapper_class + ' ';
 
@@ -62,7 +62,7 @@ module.exports = function(grunt) {
                     + wrapper_class
                     + css.slice(match.index + match[1].length);
 
-                regex.lastIndex = match.index + match[0].length + wrapper_class.length;
+                regex.lastIndex = match.index + match[0].length + wrapper_class.length - match[1].length;
             }
 
             return css;
