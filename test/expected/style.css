@@ -11,3 +11,6 @@
     } .no-mediaqueries span {
         font-size: 10px;
     }
+ .no-mediaqueries .foobar {
+        color: tomato;
+    }

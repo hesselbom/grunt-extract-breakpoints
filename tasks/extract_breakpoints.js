@@ -90,6 +90,8 @@ module.exports = function(grunt) {
                 match,
                 match_min,
                 match_max,
+                matches,
+                is_inside,
                 min,
                 max,
                 closetag_index,
@@ -98,21 +100,30 @@ module.exports = function(grunt) {
 
             // Calculate and replace rem with px
             while (match = regex.exec(filecontent)) {
-                match_min = match[0].match(regex_min);
-                match_max = match[0].match(regex_max);
-                min = 0;
-                max = 999999;
+                is_inside = false;
+                matches = match[0].split(',');
 
-                if (match_min) {
-                    min = parseNumber(match_min[1]);
+                for (var i = 0; i < matches.length; i++) {
+                    match_min = matches[i].match(regex_min);
+                    match_max = matches[i].match(regex_max);
+                    min = 0;
+                    max = 999999;
+
+                    if (match_min) {
+                        min = parseNumber(match_min[1]);
+                    }
+
+                    if (match_max) {
+                        max = parseNumber(match_max[1]);
+                    }
+
+                    // Width is inside breakpoint boundaries
+                    if (options.width >= min && options.width <= max) {
+                        is_inside = true;
+                    }
                 }
 
-                if (match_max) {
-                    max = parseNumber(match_max[1]);
-                }
-
-                // Width is inside breakpoint boundaries
-                if (options.width >= min && options.width <= max) {
+                if (is_inside) {
                     // Remove @media selector
                     closetag_index = findCloseTagIndex(filecontent, match.index);
                     content = filecontent.slice(match.index + match[0].length, closetag_index);
@@ -123,7 +134,6 @@ module.exports = function(grunt) {
 
                     new_filecontent += content;
                 }
-                // Not inside
                 else {
                     // Remove @media selector with content
                     closetag_index = findCloseTagIndex(filecontent, match.index);
