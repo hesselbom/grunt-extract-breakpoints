@@ -2,14 +2,14 @@ p {
     font-size: 5px;
 }
 
-// 630px
+/* 630px */
 @media (min-width: 39.375em) {
     p {
         font-size: 6px;
     }
 }
 
-// 900px
+/* 900px */
 @media (max-width: 900px) {
     p {
         font-size: 7px;
@@ -17,7 +17,7 @@ p {
 }
 @media (max-width: 900px) { p { font-size: 7.5px; } }
 
-// 940px
+/* 940px */
 @media (min-width: 58.75em) {
     p {
         font-size: 8px;
@@ -25,7 +25,7 @@ p {
 }
 @media (min-width: 58.75rem) { p { font-size: 8.5px; } }
 
-// 0px - 800px
+/* 0px - 800px */
 @media screen and (min-width: 0) and (max-width: 800px) {
     .nested p, .comma-separated {
         font-size: 9px;
@@ -40,7 +40,7 @@ p {
     }
 }
 
-// 0px - 100px or 200px - 800px
+/* 0px - 100px or 200px - 800px */
 @media screen and (min-width: 0) and (max-width: 100px), (min-width: 200px) and (max-width: 800px) {
     .foobar {
         color: tomato;

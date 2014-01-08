@@ -98,6 +98,9 @@ module.exports = function(grunt) {
                 content,
                 new_filecontent = '';
 
+            // Remove comments
+            filecontent = filecontent.replace(/\/\*[\S\s]+?\*\//g, '');
+
             // Calculate and replace rem with px
             while (match = regex.exec(filecontent)) {
                 is_inside = false;
