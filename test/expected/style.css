@@ -9,3 +9,6 @@
     } .no-mediaqueries span {
         font-size: 9px;
     }
+ .no-mediaqueries .foobar {
+        color: tomato;
+    }
