@@ -31,7 +31,11 @@ p {
         font-size: 9px;
     }
 
+    html {} html .nested {
+        font-size: 9.5px;
+    }
+
     span {
-        font-size: 9px;
+        font-size: 10px;
     }
 }

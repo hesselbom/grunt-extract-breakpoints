@@ -52,17 +52,29 @@ module.exports = function(grunt) {
             return -1;
         }
 
-        function addWrapperClass(css, wrapper_class) {
+        function addWrapperClass(css, base_wrapper_class) {
             var regex = new RegExp(/(\s*)([^{},]+)\s*[{,]/g),
-                match,
-                wrapper_class = ' .' + wrapper_class + ' ';
+                match, wrapper_class;
 
             while (match = regex.exec(css)) {
-                css = css.slice(0, match.index)
-                    + wrapper_class
-                    + css.slice(match.index + match[1].length);
+                if (match[2].match(/^html/)) {
+                    wrapper_class = 'html.' + base_wrapper_class + ' ';
 
-                regex.lastIndex = match.index + match[0].length + wrapper_class.length - match[1].length;
+                    css = css.slice(0, match.index)
+                        + wrapper_class
+                        + css.slice(match.index + match[1].length + 'html'.length);
+
+                    regex.lastIndex = match.index + match[0].length + wrapper_class.length - match[1].length - 'html'.length;
+                }
+                else {
+                    wrapper_class = ' .' + base_wrapper_class + ' ';
+
+                    css = css.slice(0, match.index)
+                        + wrapper_class
+                        + css.slice(match.index + match[1].length);
+
+                    regex.lastIndex = match.index + match[0].length + wrapper_class.length - match[1].length;
+                }
             }
 
             return css;

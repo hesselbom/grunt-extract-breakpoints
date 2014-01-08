@@ -6,6 +6,8 @@
     }
  .no-mediaqueries p { font-size: 7.5px; }  .no-mediaqueries .nested p, .no-mediaqueries .comma-separated {
         font-size: 9px;
+    }html.no-mediaqueries  {}html.no-mediaqueries  .nested {
+        font-size: 9.5px;
     } .no-mediaqueries span {
-        font-size: 9px;
+        font-size: 10px;
     }
