@@ -54,8 +54,9 @@ module.exports = function(grunt) {
 
         function addWrapperClass(css, wrapper_class) {
             var regex = new RegExp(/(\s*)([^{},]+)\s*[{,]/g),
-                match,
-                wrapper_class = ' .' + wrapper_class + ' ';
+                match;
+
+            wrapper_class = ' .' + wrapper_class + ' ';
 
             while (match = regex.exec(css)) {
                 css = css.slice(0, match.index)
