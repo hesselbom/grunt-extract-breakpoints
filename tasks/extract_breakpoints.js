@@ -57,24 +57,28 @@ module.exports = function(grunt) {
         }
 
         function parseSelectors(css, breakpoints) {
-            var selector_regex = new RegExp(/(\s*)([^{},]+)\s*[{,]/g),
+            var selector_regex = new RegExp(/([^{}]+){/g),
                 property_regex = new RegExp(/([^{}:;]+)\s*:\s*([^;}]+)/g),
                 match, match2,
                 results = [];
 
             while (match = selector_regex.exec(css)) {
-                var selector = trim(match[2]),
-                    content = css.substring(match.index, css.indexOf('}', match.index)),
-                    obj = { selector: selector, breakpoints: breakpoints, properties: [] };
+                var selectors = match[1].split(',');
 
-                while (match2 = property_regex.exec(content)) {
-                    var property = trim(match2[1]),
-                        value = trim(match2[2]);
+                for (var i = 0; i < selectors.length; i++) {
+                    var selector = trim(selectors[i]),
+                        content = css.substring(match.index, css.indexOf('}', match.index)),
+                        obj = { selector: selector, breakpoints: breakpoints, properties: [] };
 
-                    obj.properties.push({ property: property, value: value });
+                    while (match2 = property_regex.exec(content)) {
+                        var property = trim(match2[1]),
+                            value = trim(match2[2]);
+
+                        obj.properties.push({ property: property, value: value });
+                    }
+
+                    results.push(obj);
                 }
-
-                results.push(obj);
             }
 
             return results;
@@ -187,6 +191,7 @@ module.exports = function(grunt) {
                 }
             }
 
+            // Create css from selectors
             for (i in new_selectors) {
                 if (new_selectors.hasOwnProperty(i)) {
                     selector = i;

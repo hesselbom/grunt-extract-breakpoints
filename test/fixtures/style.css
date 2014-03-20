@@ -54,6 +54,7 @@ p {
     .override {
         font-size: 8px;
         background: black;
+        border-color: rgba(0, 0, 0, 0);
     }
     .test {}
 }
