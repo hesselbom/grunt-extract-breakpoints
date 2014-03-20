@@ -31,6 +31,8 @@ p {
         font-size: 9px;
     }
 
+    html.test {}
+
     html {} html .nested {
         font-size: 9.5px;
     }
@@ -44,5 +46,20 @@ p {
 @media screen and (min-width: 0) and (max-width: 100px), (min-width: 200px) and (max-width: 800px) {
     .foobar {
         color: tomato;
+    }
+}
+
+/* Override if multiple breakpoints are matches */
+@media (min-width: 200px) {
+    .override {
+        font-size: 8px;
+        background: black;
+    }
+    .test {}
+}
+
+@media (min-width: 500px) {
+    .override {
+        font-size: 9px;
     }
 }

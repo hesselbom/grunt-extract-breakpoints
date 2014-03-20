@@ -14,6 +14,10 @@ module.exports = function(grunt) {
         var dest = this.data.dest,
             options = this.options();
 
+        function trim(str) {
+            return str.replace(/^\s+|\s+$/g, '');
+        }
+
         function findCloseTagIndex(filecontent, offset) {
             var regex_closetag = new RegExp(/[{}]/g),
                 open_tags = 0,
@@ -52,32 +56,47 @@ module.exports = function(grunt) {
             return -1;
         }
 
-        function addWrapperClass(css, base_wrapper_class) {
-            var regex = new RegExp(/(\s*)([^{},]+)\s*[{,]/g),
-                match, wrapper_class;
+        function parseSelectors(css, breakpoints) {
+            var selector_regex = new RegExp(/(\s*)([^{},]+)\s*[{,]/g),
+                property_regex = new RegExp(/([^{}:;]+)\s*:\s*([^;}]+)/g),
+                match, match2,
+                results = [];
 
-            while (match = regex.exec(css)) {
-                if (match[2].match(/^html/)) {
-                    wrapper_class = 'html.' + base_wrapper_class + ' ';
+            while (match = selector_regex.exec(css)) {
+                var selector = trim(match[2]),
+                    content = css.substring(match.index, css.indexOf('}', match.index)),
+                    obj = { selector: selector, breakpoints: breakpoints, properties: [] };
 
-                    css = css.slice(0, match.index)
-                        + wrapper_class
-                        + css.slice(match.index + match[1].length + 'html'.length);
+                while (match2 = property_regex.exec(content)) {
+                    var property = trim(match2[1]),
+                        value = trim(match2[2]);
 
-                    regex.lastIndex = match.index + match[0].length + wrapper_class.length - match[1].length - 'html'.length;
+                    obj.properties.push({ property: property, value: value });
                 }
-                else {
-                    wrapper_class = ' .' + base_wrapper_class + ' ';
 
-                    css = css.slice(0, match.index)
-                        + wrapper_class
-                        + css.slice(match.index + match[1].length);
+                results.push(obj);
+            }
 
-                    regex.lastIndex = match.index + match[0].length + wrapper_class.length - match[1].length;
+            return results;
+        }
+
+        // Compare breakpoints and return 1 if first if preferred and 2 if second is
+        // TODO: Check how this works with OR in media queries
+        function compareBreakpoints(b1, b2) {
+            var preferred = 1, i, j;
+
+            for (i = 0; i < b1.length; i++) {
+                for (j = 0; j < b2.length; j++) {
+                    if (b1[i].min > b2[j].min) {
+                        preferred = 1;
+                    }
+                    else {
+                        preferred = 2;
+                    }
                 }
             }
 
-            return css;
+            return preferred;
         }
 
         this.files[0].src.forEach(function(filepath) {
@@ -91,22 +110,26 @@ module.exports = function(grunt) {
                 match_min,
                 match_max,
                 matches,
-                is_inside,
+                matched_breakpoints,
                 min,
                 max,
                 closetag_index,
                 content,
-                new_filecontent = '';
+                new_filecontent = '',
+                new_selectors = {},
+                selector,
+                new_selector,
+                i, j, property;
 
             // Remove comments
             filecontent = filecontent.replace(/\/\*[\S\s]+?\*\//g, '');
 
             // Calculate and replace rem with px
             while (match = regex.exec(filecontent)) {
-                is_inside = false;
                 matches = match[0].split(',');
+                matched_breakpoints = [];
 
-                for (var i = 0; i < matches.length; i++) {
+                for (i = 0; i < matches.length; i++) {
                     match_min = matches[i].match(regex_min);
                     match_max = matches[i].match(regex_max);
                     min = 0;
@@ -122,25 +145,69 @@ module.exports = function(grunt) {
 
                     // Width is inside breakpoint boundaries
                     if (options.width >= min && options.width <= max) {
-                        is_inside = true;
+                        matched_breakpoints.push({ min: min, max: max });
                     }
                 }
 
-                if (is_inside) {
+                if (matched_breakpoints.length > 0) {
                     // Remove @media selector
                     closetag_index = findCloseTagIndex(filecontent, match.index);
                     content = filecontent.slice(match.index + match[0].length, closetag_index);
 
-                    if (options.wrapper_class) {
-                        content = addWrapperClass(content, options.wrapper_class);
-                    }
+                    var parsed = parseSelectors(content, matched_breakpoints);
 
-                    new_filecontent += content;
+                    for (i = 0; i < parsed.length; i++) {
+                        selector = parsed[i];
+
+                        if (!(selector.selector in new_selectors)) {
+                            new_selectors[selector.selector] = {};
+                        }
+
+                        new_selector = new_selectors[selector.selector];
+
+                        for (j = 0; j < selector.properties.length; j++) {
+                            property = selector.properties[j];
+
+                            // If property already exists, compare breakpoints to see which should be preferred
+                            if (property.property in new_selector) {
+                                if (compareBreakpoints(selector.breakpoints, new_selector[property.property].breakpoints) === 1) {
+                                    new_selector[property.property] = { value: property.value, breakpoints: selector.breakpoints };
+                                }
+                            }
+                            else {
+                                new_selector[property.property] = { value: property.value, breakpoints: selector.breakpoints };
+                            }
+                        }
+                    }
                 }
                 else {
                     // Remove @media selector with content
                     closetag_index = findCloseTagIndex(filecontent, match.index);
                     regex.lastIndex = closetag_index;
+                }
+            }
+
+            for (i in new_selectors) {
+                if (new_selectors.hasOwnProperty(i)) {
+                    selector = i;
+
+                    if (options.wrapper_class) {
+                        if (selector.match(/^html/)) {
+                            selector = selector.substr('html'.length);
+                            new_filecontent += 'html.' + options.wrapper_class;
+                        }
+                        else {
+                            new_filecontent += '.' + options.wrapper_class + ' ';
+                        }
+                    }
+
+                    new_filecontent += selector + '{';
+
+                    for (j in new_selectors[i]) {
+                        new_filecontent += j + ':' + new_selectors[i][j].value + ';';
+                    }
+
+                    new_filecontent += '}';
                 }
             }
 
