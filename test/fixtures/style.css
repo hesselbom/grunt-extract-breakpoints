@@ -64,3 +64,11 @@ p {
         font-size: 9px;
     }
 }
+
+
+@media (min-width: 20em) {
+  .test, .test2 {
+  }
+  .test:after, .test2:after {
+  }
+}

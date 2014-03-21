@@ -67,7 +67,7 @@ module.exports = function(grunt) {
 
                 for (var i = 0; i < selectors.length; i++) {
                     var selector = trim(selectors[i]),
-                        content = css.substring(match.index, css.indexOf('}', match.index)),
+                        content = css.substring(css.indexOf('{', match.index), css.indexOf('}', match.index)),
                         obj = { selector: selector, breakpoints: breakpoints, properties: [] };
 
                     while (match2 = property_regex.exec(content)) {
