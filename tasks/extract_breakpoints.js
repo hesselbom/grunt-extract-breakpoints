@@ -174,7 +174,12 @@ module.exports = function(grunt) {
 
                             // If property already exists, compare breakpoints to see which should be preferred
                             if (property.property in new_selector) {
-                                if (compareBreakpoints(selector.breakpoints, new_selector[property.property].breakpoints) === 1) {
+                                if (
+                                    // Check if equal breakpoints
+                                    selector.breakpoints === new_selector[property.property].breakpoints ||
+                                    // Or check if preferred
+                                    compareBreakpoints(selector.breakpoints, new_selector[property.property].breakpoints) === 1
+                                ) {
                                     new_selector[property.property] = { value: property.value, breakpoints: selector.breakpoints };
                                 }
                             }
