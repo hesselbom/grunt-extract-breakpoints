@@ -110,9 +110,11 @@ module.exports = function(grunt) {
                 regex = new RegExp(/@media\s*([^{]*)\s*{/g),
                 regex_min = new RegExp(/min-width\s*:\s*([^)]*)\)/),
                 regex_max = new RegExp(/max-width\s*:\s*([^)]*)\)/),
+                regex_print = new RegExp(/print/),
                 match,
                 match_min,
                 match_max,
+                match_print,
                 matches,
                 matched_breakpoints,
                 min,
@@ -128,7 +130,7 @@ module.exports = function(grunt) {
             // Remove comments
             filecontent = filecontent.replace(/\/\*[\S\s]+?\*\//g, '');
 
-            // Calculate and replace rem with px
+            // Match breakpoints
             while (match = regex.exec(filecontent)) {
                 matches = match[0].split(',');
                 matched_breakpoints = [];
@@ -136,6 +138,7 @@ module.exports = function(grunt) {
                 for (i = 0; i < matches.length; i++) {
                     match_min = matches[i].match(regex_min);
                     match_max = matches[i].match(regex_max);
+                    match_print = matches[i].match(regex_print);
                     min = 0;
                     max = 999999;
 
@@ -148,7 +151,7 @@ module.exports = function(grunt) {
                     }
 
                     // Width is inside breakpoint boundaries
-                    if (options.width >= min && options.width <= max) {
+                    if (options.width >= min && options.width <= max && !match_print) {
                         matched_breakpoints.push({ min: min, max: max });
                     }
                 }

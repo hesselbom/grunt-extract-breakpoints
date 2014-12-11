@@ -73,3 +73,8 @@ p {
   .test:after, .test2:after {
   }
 }
+
+@media print {
+  .print {
+  }
+}
